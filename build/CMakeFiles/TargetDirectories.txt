@@ -1,0 +1,3 @@
+/home/j/TruckTrajectoryExplorer/build/CMakeFiles/example-app.dir
+/home/j/TruckTrajectoryExplorer/build/CMakeFiles/edit_cache.dir
+/home/j/TruckTrajectoryExplorer/build/CMakeFiles/rebuild_cache.dir
