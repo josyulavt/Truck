@@ -3,6 +3,7 @@ import pydrake.symbolic as sym
 from pydrake.all import (Variable, OsqpSolver, Solve, SnoptSolver, eq, IpoptSolver)
 from pydrake.solvers import MathematicalProgram 
 import numpy as np
+
 def continuous_kinematics(x, u):
     #x = [x, y, theta0, theta1, v, delta]
     #u = [v, delta]
@@ -75,7 +76,7 @@ def lqr(x_bar, u_bar, dt):
     dx = x[:,0] - x_bar
     du = u[:] - u_bar
     dxdt = A_x@dx + B_u@du
-    print(dxdt.shape)
+    # print(dxdt.shape)
     fxu = continuous_kinematics(x[:,0], u)
     for i in range(6): 
         prog.AddConstraint(x[i, 1] == x[i, 0] + (fxu[i] + dxdt[i])*dt)
@@ -85,9 +86,45 @@ def lqr(x_bar, u_bar, dt):
     solver = IpoptSolver()
     
     result = solver.Solve(prog)
-    x_opt = result.GetSolution(x)
-    return x_opt
+    u_sol = result.GetSolution(u)
+    x_sol = result.GetSolution(x)
+    print("u_sol", u_sol)
+    print("x_sol", x_sol)
+    return u_sol, x_sol
+
 
 #test lqr with fake data
 
-lqr(np.array([0.1,0.1,0.1,0.1,0.1,0.1]), np.array([0,0]), 0.1)
+# lqr(np.array([0.1,0.1,0.1,0.1,0.1,0.1]), np.array([0,0]), 0.1)
+import matplotlib.pyplot as plt
+
+x = [0, 0.0516223, 0.0891949, 0.0881861, 0.008462, -0.256918, -1.03396, -3.14422, -8.2997, -19.5812, -41.9364] 
+y = [5, 5.08979, 5.16027, 5.124, 4.91303, 4.54727, 4.11682, 3.69573, 3.25676, 2.65966, 1.73982]
+theta0 = [0.0] 
+theta1 = [0.0]
+v = [0.0] 
+delta = [0.0]
+
+x_act = [] 
+y_act = []
+v_act = []
+delta_act = []
+
+for i in range(10):
+    x_bar = np.array([x[i], y[i], 0, 0, 0, 0])
+    u_bar = np.array([0, 0])
+    u_sol, x_sol = lqr(x_bar, u_bar, 0.1)
+    x_new = discrete_dynamics(x_bar, u_sol, 0.1)
+    x_act.append(x_new[0])
+    y_act.append(x_new[1])
+    theta0.append(x_new[2])
+    theta1.append(x_new[3])
+    v.append(x_new[4])
+    delta.append(x_new[5])
+    v_act.append(u_sol[0])
+    delta_act.append(u_sol[1])
+
+plt.plot(x_act, y_act, 'r-')    
+plt.plot(x, y, 'b+')
+plt.show()
+ #fixed for tracking with lqr, need to implement tracking with mpc

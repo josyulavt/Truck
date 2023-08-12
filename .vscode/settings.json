@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/j/TruckTrajectoryExplorer/matplotlib-cpp"
+    "cmake.sourceDirectory": "/home/j/TruckTrajectoryExplorer/matplotlib-cpp",
+    "cmake.configureOnOpen": false
 }
