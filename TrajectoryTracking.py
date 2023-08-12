@@ -127,4 +127,4 @@ for i in range(10):
 plt.plot(x_act, y_act, 'r-')    
 plt.plot(x, y, 'b+')
 plt.show()
- 
+ #fixed for tracking with lqr, need to implement tracking with mpc
